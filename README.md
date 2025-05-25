@@ -2,16 +2,30 @@
 
 <div align="center">
 
-![MovieWrite Logo](https://img.shields.io/badge/MovieWrite-Web3%20Platform-blue?style=for-the-badge&logo=ethereum)
+![MovieWrite Banner](https://img.shields.io/badge/MovieWrite-Web3%20Collaboration%20Platform-blue?style=for-the-badge&logo=ethereum&logoColor=white)
 
-**一个基于区块链的电影文章协作创作平台，让创作者们通过文章接力的方式共同完成精彩的电影评论和分析文章**
+**🌟 基于区块链的电影文章协作创作平台 🌟**
 
-[![Solidity](https://img.shields.io/badge/Solidity-0.8.20-363636?style=flat-square&logo=solidity)](https://soliditylang.org/)
-[![Next.js](https://img.shields.io/badge/Next.js-14-black?style=flat-square&logo=next.js)](https://nextjs.org/)
-[![Hardhat](https://img.shields.io/badge/Hardhat-Latest-yellow?style=flat-square&logo=ethereum)](https://hardhat.org/)
+*让电影爱好者通过Web3技术协作创作精彩的电影评论和分析文章*
+
+[![Solidity](https://img.shields.io/badge/Solidity-0.8.20-363636?style=flat-square&logo=solidity&logoColor=white)](https://soliditylang.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-14-black?style=flat-square&logo=next.js&logoColor=white)](https://nextjs.org/)
+[![Hardhat](https://img.shields.io/badge/Hardhat-Latest-yellow?style=flat-square&logo=ethereum&logoColor=black)](https://hardhat.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.2-blue?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-3.3-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 
-[🚀 快速开始](#-快速开始) • [📖 文档](#-智能合约功能) • [🎯 演示](#-使用流程) • [🎓 学习指南](#-web3学习指南) • [🤝 贡献](#-贡献指南)
+[🚀 快速开始](#-快速开始) • [📖 功能介绍](#-项目特色) • [🎯 在线演示](#-使用流程) • [🎓 学习指南](#-web3学习指南) • [🤝 贡献](#-贡献指南)
+
+---
+
+### 🎯 项目亮点
+
+🤝 **多人协作写作** - 支持多位作者接力完成电影文章  
+🔗 **区块链激励** - 基于智能合约的透明奖励机制  
+🏆 **NFT收藏** - 优秀文章可铸造为独特的NFT收藏品  
+📚 **完整教程** - 为Java/Python开发者提供Web3入门指南  
+🎨 **现代UI** - 响应式设计，流畅的用户体验  
 
 </div>
 
@@ -19,7 +33,7 @@
 
 ## 🎓 Web3学习指南
 
-**专为Java/Python程序员设计的Web3入门教程！**
+**🔥 专为传统后端开发者设计的Web3入门教程！**
 
 ### 📚 学习资源
 
