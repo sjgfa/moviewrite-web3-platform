@@ -167,8 +167,8 @@ movie-article-web3/
 
 1. **克隆项目**
 ```bash
-git clone https://github.com/your-username/movie-article-web3.git
-cd movie-article-web3
+git clone https://github.com/sjgfa/moviewrite-web3-platform.git
+cd moviewrite-web3-platform
 ```
 
 2. **安装依赖**
