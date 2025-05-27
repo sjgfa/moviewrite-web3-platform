@@ -1,23 +1,47 @@
-import { Fragment } from 'react';
+import { Fragment, useState, useEffect } from 'react';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { useAccount } from 'wagmi';
+import { useAccount, useContractRead } from 'wagmi';
 import { 
   FilmIcon, 
   HomeIcon, 
   BookOpenIcon, 
   UserIcon,
-  Cog6ToothIcon
+  Cog6ToothIcon,
+  CrownIcon
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
+import { CONTRACT_ADDRESSES, MOVIE_ARTICLE_ABI } from '@/lib/web3';
 
 export default function Layout({ children }) {
   const { address, isConnected } = useAccount();
+  const [mounted, setMounted] = useState(false);
+
+  // 防止hydration错误
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // 检查是否是管理员
+  const { data: contractOwner } = useContractRead({
+    address: CONTRACT_ADDRESSES.MOVIE_ARTICLE,
+    abi: MOVIE_ARTICLE_ABI,
+    functionName: 'owner',
+    enabled: mounted && isConnected,
+  });
+
+  const isAdmin = mounted && contractOwner && address && 
+    contractOwner.toLowerCase() === address.toLowerCase();
 
   const navigation = [
     { name: '首页', href: '/', icon: HomeIcon },
     { name: '文章', href: '/articles', icon: BookOpenIcon },
     { name: '我的', href: '/profile', icon: UserIcon },
   ];
+
+  // 如果是管理员，添加管理员链接
+  if (isAdmin) {
+    navigation.push({ name: '管理员', href: '/admin', icon: CrownIcon });
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">

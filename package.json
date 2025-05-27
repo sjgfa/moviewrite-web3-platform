@@ -26,7 +26,11 @@
     "restart": "npm run kill:node && npm run clean && echo 'Now run: npm run quick-start'",
     "fix-hydration": "node scripts/fix-hydration.js",
     "fix-all": "npm run fix-hydration && npm run restart",
-    "help": "echo 'Available commands: npm run quick-start (recommended), npm run start:dev, npm run diagnose, npm run fix-hydration'"
+    "rewards": "hardhat run scripts/auto-rewards.js --network localhost",
+    "rewards:auto": "hardhat run scripts/auto-rewards.js --network localhost",
+    "admin": "node scripts/admin-quick-start.js",
+    "admin:start": "node scripts/admin-quick-start.js",
+    "help": "echo 'Available commands: npm run quick-start (recommended), npm run start:dev, npm run diagnose, npm run fix-hydration, npm run rewards, npm run admin'"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.17",
