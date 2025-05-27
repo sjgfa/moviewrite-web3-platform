@@ -31,7 +31,9 @@
     "admin": "node scripts/admin-quick-start.js",
     "admin:start": "node scripts/admin-quick-start.js",
     "admin:fix": "node scripts/fix-admin-errors.js",
-    "help": "echo 'Available commands: npm run quick-start (recommended), npm run start:dev, npm run diagnose, npm run fix-hydration, npm run rewards, npm run admin, npm run admin:fix'"
+    "admin:simple": "node scripts/simple-admin-start.js",
+    "fresh-restart": "node scripts/fresh-restart.js",
+    "help": "echo 'Available commands: npm run quick-start (recommended), npm run start:dev, npm run diagnose, npm run fix-hydration, npm run rewards, npm run admin, npm run admin:fix, npm run admin:simple, npm run fresh-restart'"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.17",
