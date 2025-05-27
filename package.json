@@ -9,8 +9,11 @@
     "start": "next start",
     "lint": "next lint",
     "compile": "hardhat compile",
-    "deploy": "hardhat run scripts/deploy.js",
+    "deploy": "hardhat run scripts/deploy-and-setup.js --network localhost",
+    "deploy:local": "hardhat run scripts/deploy-and-setup.js --network localhost",
     "test": "hardhat test",
+    "node": "hardhat node",
+    "start:dev": "node scripts/start-dev.js",
     "setup": "node scripts/setup.js"
   },
   "dependencies": {

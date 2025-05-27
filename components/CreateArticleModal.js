@@ -20,7 +20,7 @@ export default function CreateArticleModal({ isOpen, onClose }) {
   ];
 
   const { data, write, isLoading } = useContractWrite({
-    address: CONTRACT_ADDRESSES.movieArticle,
+    address: CONTRACT_ADDRESSES.MOVIE_ARTICLE,
     abi: MOVIE_ARTICLE_ABI,
     functionName: 'createArticle',
   });
@@ -202,18 +202,28 @@ export default function CreateArticleModal({ isOpen, onClose }) {
                     </div>
                   </div>
 
-                  <div className="flex justify-end space-x-3 pt-4">
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <h4 className="text-sm font-medium text-gray-900 mb-2">创建说明</h4>
+                    <ul className="text-xs text-gray-600 space-y-1">
+                      <li>• 文章创建后，其他用户可以为其贡献内容</li>
+                      <li>• 每个用户只能为同一篇文章贡献一次</li>
+                      <li>• 达到最大贡献者数量后，文章可以被完成</li>
+                      <li>• 完成的文章可以铸造为NFT证书</li>
+                    </ul>
+                  </div>
+
+                  <div className="flex space-x-3 pt-4">
                     <button
                       type="button"
                       onClick={onClose}
-                      className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                      className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                     >
                       取消
                     </button>
                     <button
                       type="submit"
                       disabled={isLoading || isTransactionLoading}
-                      className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      className="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {isLoading || isTransactionLoading ? '创建中...' : '创建文章'}
                     </button>
