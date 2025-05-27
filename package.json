@@ -21,7 +21,7 @@
     "test-abi": "hardhat run scripts/test-abi.js --network localhost",
     "update-abi": "node scripts/extract-abi.js",
     "diagnose": "hardhat run scripts/diagnose-contract.js --network localhost",
-    "clean": "rimraf .next node_modules/.cache artifacts cache",
+    "clean": "node scripts/safe-reset.js",
     "kill:node": "taskkill /f /im node.exe 2>nul || echo 'No node processes found'",
     "restart": "npm run kill:node && npm run clean && echo 'Now run: npm run quick-start'",
     "fix-hydration": "node scripts/fix-hydration.js",
@@ -35,7 +35,10 @@
     "fresh-restart": "node scripts/fresh-restart.js",
     "test-contract": "hardhat run scripts/test-contract.js --network localhost",
     "keys": "node scripts/show-private-keys.js",
-    "help": "echo 'Available commands: npm run quick-start (recommended), npm run start:dev, npm run diagnose, npm run fix-hydration, npm run rewards, npm run admin, npm run admin:fix, npm run admin:simple, npm run fresh-restart, npm run test-contract, npm run keys'"
+    "reset": "node scripts/safe-reset.js",
+    "quick-reset": "node scripts/quick-reset.js",
+    "full-reset": "node scripts/full-reset.js",
+    "help": "echo 'Available commands: npm run quick-start (recommended), npm run start:dev, npm run diagnose, npm run fix-hydration, npm run rewards, npm run admin, npm run admin:fix, npm run admin:simple, npm run fresh-restart, npm run test-contract, npm run keys, npm run reset, npm run full-reset'"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.17",
