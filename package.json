@@ -30,7 +30,8 @@
     "rewards:auto": "hardhat run scripts/auto-rewards.js --network localhost",
     "admin": "node scripts/admin-quick-start.js",
     "admin:start": "node scripts/admin-quick-start.js",
-    "help": "echo 'Available commands: npm run quick-start (recommended), npm run start:dev, npm run diagnose, npm run fix-hydration, npm run rewards, npm run admin'"
+    "admin:fix": "node scripts/fix-admin-errors.js",
+    "help": "echo 'Available commands: npm run quick-start (recommended), npm run start:dev, npm run diagnose, npm run fix-hydration, npm run rewards, npm run admin, npm run admin:fix'"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.17",
