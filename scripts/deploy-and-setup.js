@@ -13,7 +13,13 @@ async function main() {
   // 部署 RewardToken 合约
   console.log("\n部署 RewardToken 合约...");
   const RewardToken = await ethers.getContractFactory("RewardToken");
-  const rewardToken = await RewardToken.deploy(deployer.address);
+  const initialSupply = ethers.parseEther("1000000"); // 1,000,000 MWT
+  const rewardToken = await RewardToken.deploy(
+    "MovieWrite Token",
+    "MWT", 
+    initialSupply,
+    deployer.address
+  );
   await rewardToken.waitForDeployment();
   const rewardTokenAddress = await rewardToken.getAddress();
   console.log("RewardToken 部署到:", rewardTokenAddress);
@@ -21,21 +27,22 @@ async function main() {
   // 部署 MovieArticle 合约
   console.log("\n部署 MovieArticle 合约...");
   const MovieArticle = await ethers.getContractFactory("MovieArticle");
-  const movieArticle = await MovieArticle.deploy(rewardTokenAddress, deployer.address);
+  const movieArticle = await MovieArticle.deploy(rewardTokenAddress);
   await movieArticle.waitForDeployment();
   const movieArticleAddress = await movieArticle.getAddress();
   console.log("MovieArticle 部署到:", movieArticleAddress);
 
   // 给 MovieArticle 合约铸造权限
   console.log("\n设置权限...");
-  const MINTER_ROLE = await rewardToken.MINTER_ROLE();
-  await rewardToken.grantRole(MINTER_ROLE, movieArticleAddress);
-  console.log("已授予 MovieArticle 合约铸造权限");
+  // 由于 RewardToken 使用 Ownable，我们需要转移一些代币给 MovieArticle 合约用于奖励
+  const rewardSupply = ethers.parseEther("100000"); // 100,000 MWT 用于奖励
+  await rewardToken.transfer(movieArticleAddress, rewardSupply);
+  console.log("已转移 100,000 MWT 给 MovieArticle 合约用于奖励");
 
   // 给部署者一些初始代币用于测试
   console.log("\n铸造初始代币...");
-  const initialSupply = ethers.parseEther("10000"); // 10,000 MWT
-  await rewardToken.mint(deployer.address, initialSupply);
+  const initialSupplyForMint = ethers.parseEther("10000"); // 10,000 MWT
+  await rewardToken.mint(deployer.address, initialSupplyForMint);
   console.log("已铸造 10,000 MWT 给部署者");
 
   // 更新合约地址配置文件

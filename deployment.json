@@ -1,6 +1,16 @@
 {
   "network": "localhost",
-  "rewardToken": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
-  "movieArticle": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
-  "deployedAt": "2025-05-25T12:03:38.591Z"
+  "deployer": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+  "timestamp": "2025-05-27T02:14:38.484Z",
+  "contracts": {
+    "RewardToken": {
+      "address": "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9",
+      "name": "MovieWrite Token",
+      "symbol": "MWT"
+    },
+    "MovieArticle": {
+      "address": "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707",
+      "rewardTokenAddress": "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9"
+    }
+  }
 }
