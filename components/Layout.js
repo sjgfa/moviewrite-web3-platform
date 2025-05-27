@@ -7,7 +7,7 @@ import {
   BookOpenIcon, 
   UserIcon,
   Cog6ToothIcon,
-  CrownIcon
+  CommandLineIcon
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { CONTRACT_ADDRESSES, MOVIE_ARTICLE_ABI } from '@/lib/web3';
@@ -23,10 +23,10 @@ export default function Layout({ children }) {
 
   // 检查是否是管理员
   const { data: contractOwner } = useContractRead({
-    address: CONTRACT_ADDRESSES.MOVIE_ARTICLE,
+    address: CONTRACT_ADDRESSES?.MOVIE_ARTICLE,
     abi: MOVIE_ARTICLE_ABI,
     functionName: 'owner',
-    enabled: mounted && isConnected,
+    enabled: mounted && isConnected && CONTRACT_ADDRESSES?.MOVIE_ARTICLE,
   });
 
   const isAdmin = mounted && contractOwner && address && 
@@ -40,7 +40,7 @@ export default function Layout({ children }) {
 
   // 如果是管理员，添加管理员链接
   if (isAdmin) {
-    navigation.push({ name: '管理员', href: '/admin', icon: CrownIcon });
+    navigation.push({ name: '管理员', href: '/admin', icon: CommandLineIcon });
   }
 
   return (

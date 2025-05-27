@@ -3,7 +3,7 @@ import Head from 'next/head';
 import { useAccount, useContractRead, useContractWrite } from 'wagmi';
 import { motion } from 'framer-motion';
 import { 
-  CrownIcon,
+  CommandLineIcon,
   GiftIcon,
   DocumentTextIcon,
   UsersIcon,
@@ -183,7 +183,7 @@ export default function AdminPanel() {
         </Head>
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="text-center">
-            <CrownIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+            <CommandLineIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-gray-900 mb-2">管理员面板</h2>
             <p className="text-gray-600 mb-4">请先连接钱包以访问管理功能</p>
           </div>
@@ -222,7 +222,7 @@ export default function AdminPanel() {
           {/* 头部 */}
           <div className="mb-8">
             <div className="flex items-center space-x-3">
-              <CrownIcon className="h-8 w-8 text-yellow-500" />
+              <CommandLineIcon className="h-8 w-8 text-yellow-500" />
               <h1 className="text-3xl font-bold text-gray-900">管理员面板</h1>
             </div>
             <p className="mt-2 text-gray-600">管理文章、贡献和奖励分配</p>
