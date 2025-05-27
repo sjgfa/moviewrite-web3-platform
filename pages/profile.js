@@ -22,6 +22,12 @@ export default function Profile() {
   const [userContributions, setUserContributions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('articles');
+  const [mounted, setMounted] = useState(false);
+
+  // 防止 hydration 错误
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // 获取用户代币余额
   const { data: tokenBalance } = useContractRead({
@@ -29,7 +35,7 @@ export default function Profile() {
     abi: REWARD_TOKEN_ABI,
     functionName: 'balanceOf',
     args: [address],
-    enabled: !!address,
+    enabled: !!address && mounted,
     watch: true,
   });
 
@@ -39,7 +45,7 @@ export default function Profile() {
     abi: MOVIE_ARTICLE_ABI,
     functionName: 'getUserContributions',
     args: [address],
-    enabled: !!address,
+    enabled: !!address && mounted,
     watch: true,
   });
 
@@ -49,10 +55,13 @@ export default function Profile() {
     abi: MOVIE_ARTICLE_ABI,
     functionName: 'getTotalArticles',
     watch: true,
+    enabled: mounted,
   });
 
   // 获取用户创建的文章
   useEffect(() => {
+    if (!mounted) return; // 防止 SSR 时执行
+    
     const fetchUserArticles = async () => {
       if (!totalArticles || !address) {
         setUserArticles([]);
@@ -81,10 +90,12 @@ export default function Profile() {
     };
 
     fetchUserArticles();
-  }, [totalArticles, address]);
+  }, [totalArticles, address, mounted]);
 
   // 获取用户贡献详情
   useEffect(() => {
+    if (!mounted) return; // 防止 SSR 时执行
+    
     const fetchUserContributions = async () => {
       if (!contributionIds || contributionIds.length === 0) {
         setUserContributions([]);
@@ -120,7 +131,23 @@ export default function Profile() {
     };
 
     fetchUserContributions();
-  }, [contributionIds]);
+  }, [contributionIds, mounted]);
+
+  if (!mounted) {
+    return (
+      <Layout>
+        <Head>
+          <title>个人中心 - 电影文章共创平台</title>
+        </Head>
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">加载中...</p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   if (!isConnected) {
     return (

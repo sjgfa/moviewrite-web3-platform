@@ -14,7 +14,11 @@
     "test": "hardhat test",
     "node": "hardhat node",
     "start:dev": "node scripts/start-dev.js",
-    "setup": "node scripts/setup.js"
+    "setup": "node scripts/setup.js",
+    "accounts": "hardhat run scripts/show-accounts.js --network localhost",
+    "mint": "hardhat run scripts/mint-to-address.js --network localhost --",
+    "test-abi": "hardhat run scripts/test-abi.js --network localhost",
+    "update-abi": "node scripts/extract-abi.js"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.17",

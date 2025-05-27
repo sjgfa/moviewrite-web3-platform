@@ -22,6 +22,12 @@ export default function Home() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [featuredArticles, setFeaturedArticles] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
+
+  // 防止 hydration 错误
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // 获取文章总数
   const { data: totalArticles } = useContractRead({
@@ -29,6 +35,7 @@ export default function Home() {
     abi: MOVIE_ARTICLE_ABI,
     functionName: 'getTotalArticles',
     watch: true,
+    enabled: mounted, // 只在客户端挂载后启用
   });
 
   // 获取贡献总数
@@ -37,10 +44,13 @@ export default function Home() {
     abi: MOVIE_ARTICLE_ABI,
     functionName: 'getTotalContributions',
     watch: true,
+    enabled: mounted, // 只在客户端挂载后启用
   });
 
   // 获取特色文章（最新的几篇）
   useEffect(() => {
+    if (!mounted) return; // 防止 SSR 时执行
+    
     const fetchFeaturedArticles = async () => {
       if (!totalArticles || totalArticles.toString() === '0') {
         setFeaturedArticles([]);
@@ -70,7 +80,27 @@ export default function Home() {
     };
 
     fetchFeaturedArticles();
-  }, [totalArticles]);
+  }, [totalArticles, mounted]);
+
+  // 如果还没有挂载，返回加载状态
+  if (!mounted) {
+    return (
+      <Layout>
+        <Head>
+          <title>电影文章共创平台 - Web3协作写作</title>
+          <meta name="description" content="基于区块链的电影文章协作创作平台" />
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="icon" href="/favicon.ico" />
+        </Head>
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">加载中...</p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   const stats = [
     {

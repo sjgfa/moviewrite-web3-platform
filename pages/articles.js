@@ -24,6 +24,12 @@ export default function Articles() {
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
+
+  // 防止 hydration 错误
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // 获取文章总数
   const { data: totalArticles } = useContractRead({
@@ -31,10 +37,13 @@ export default function Articles() {
     abi: MOVIE_ARTICLE_ABI,
     functionName: 'getTotalArticles',
     watch: true,
+    enabled: mounted, // 只在客户端挂载后启用
   });
 
   // 获取所有文章数据
   useEffect(() => {
+    if (!mounted) return; // 防止 SSR 时执行
+    
     const fetchArticles = async () => {
       if (!totalArticles || totalArticles.toString() === '0') {
         setArticles([]);
@@ -62,7 +71,25 @@ export default function Articles() {
     };
 
     fetchArticles();
-  }, [totalArticles]);
+  }, [totalArticles, mounted]);
+
+  // 如果还没有挂载，返回加载状态
+  if (!mounted) {
+    return (
+      <Layout>
+        <Head>
+          <title>文章列表 - 电影文章共创平台</title>
+          <meta name="description" content="浏览所有电影文章创作项目" />
+        </Head>
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">加载中...</p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   // 筛选文章
   const filteredArticles = articles.filter(article => {

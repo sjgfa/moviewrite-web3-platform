@@ -30,6 +30,12 @@ export default function ArticleDetail() {
   const [loading, setLoading] = useState(true);
   const [newContribution, setNewContribution] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  // 防止 hydration 错误
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // 获取文章信息
   const { data: articleData, refetch: refetchArticle } = useContractRead({
@@ -37,7 +43,7 @@ export default function ArticleDetail() {
     abi: MOVIE_ARTICLE_ABI,
     functionName: 'articles',
     args: [id],
-    enabled: !!id,
+    enabled: !!id && mounted,
     watch: true,
   });
 
@@ -47,7 +53,7 @@ export default function ArticleDetail() {
     abi: MOVIE_ARTICLE_ABI,
     functionName: 'getArticleContributions',
     args: [id],
-    enabled: !!id,
+    enabled: !!id && mounted,
     watch: true,
   });
 
@@ -57,7 +63,7 @@ export default function ArticleDetail() {
     abi: MOVIE_ARTICLE_ABI,
     functionName: 'hasContributed',
     args: [id, address],
-    enabled: !!id && !!address,
+    enabled: !!id && !!address && mounted,
     watch: true,
   });
 
@@ -87,6 +93,8 @@ export default function ArticleDetail() {
 
   // 获取文章和贡献数据
   useEffect(() => {
+    if (!mounted) return; // 防止 SSR 时执行
+    
     if (articleData) {
       setArticle({
         id: Number(articleData[0]),
@@ -102,10 +110,12 @@ export default function ArticleDetail() {
         maxContributors: Number(articleData[10]),
       });
     }
-  }, [articleData]);
+  }, [articleData, mounted]);
 
   // 获取贡献详情
   useEffect(() => {
+    if (!mounted) return; // 防止 SSR 时执行
+    
     const fetchContributions = async () => {
       if (!contributionIds || contributionIds.length === 0) {
         setContributions([]);
@@ -129,7 +139,7 @@ export default function ArticleDetail() {
     };
 
     fetchContributions();
-  }, [contributionIds]);
+  }, [contributionIds, mounted]);
 
   const handleSubmitContribution = async () => {
     if (!newContribution.trim()) {
@@ -151,7 +161,21 @@ export default function ArticleDetail() {
     addContribution?.();
   };
 
-  if (!id) return null;
+  if (!mounted || !id) {
+    return (
+      <Layout>
+        <Head>
+          <title>文章详情 - 电影文章共创平台</title>
+        </Head>
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">加载中...</p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
