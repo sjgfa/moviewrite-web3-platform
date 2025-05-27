@@ -14,11 +14,19 @@
     "test": "hardhat test",
     "node": "hardhat node",
     "start:dev": "node scripts/start-dev.js",
+    "quick-start": "node scripts/quick-start.js",
     "setup": "node scripts/setup.js",
     "accounts": "hardhat run scripts/show-accounts.js --network localhost",
     "mint": "hardhat run scripts/mint-to-address.js --network localhost --",
     "test-abi": "hardhat run scripts/test-abi.js --network localhost",
-    "update-abi": "node scripts/extract-abi.js"
+    "update-abi": "node scripts/extract-abi.js",
+    "diagnose": "hardhat run scripts/diagnose-contract.js --network localhost",
+    "clean": "rimraf .next node_modules/.cache artifacts cache",
+    "kill:node": "taskkill /f /im node.exe 2>nul || echo 'No node processes found'",
+    "restart": "npm run kill:node && npm run clean && echo 'Now run: npm run quick-start'",
+    "fix-hydration": "node scripts/fix-hydration.js",
+    "fix-all": "npm run fix-hydration && npm run restart",
+    "help": "echo 'Available commands: npm run quick-start (recommended), npm run start:dev, npm run diagnose, npm run fix-hydration'"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.17",
