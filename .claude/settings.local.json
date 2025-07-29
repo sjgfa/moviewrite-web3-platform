@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:mirror.xyz)",
+      "Bash(node:*)",
+      "Bash(npx hardhat:*)",
+      "Bash(npm install:*)"
+    ],
+    "deny": []
+  }
+}

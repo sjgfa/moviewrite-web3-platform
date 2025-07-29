@@ -1,7 +1,7 @@
 {
   "network": "localhost",
   "deployer": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-  "timestamp": "2025-05-27T08:57:42.676Z",
+  "timestamp": "2025-05-27T09:02:23.297Z",
   "contracts": {
     "RewardToken": {
       "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
@@ -11,6 +11,23 @@
     "MovieArticle": {
       "address": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
       "rewardTokenAddress": "0x5FbDB2315678afecb367f032d93F642f64180aa3"
+    }
+  },
+  "ArticleNFT": {
+    "contractName": "ArticleNFT",
+    "contractAddress": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+    "deployer": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+    "network": "hardhat",
+    "deployedAt": "2025-07-29T06:04:33.920Z",
+    "parameters": {
+      "name": "MovieWrite Article NFT",
+      "symbol": "MWART",
+      "platformFeeRecipient": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+    },
+    "settings": {
+      "platformFeePercent": "250",
+      "defaultRoyaltyPercent": "750",
+      "mintFee": "10000000000000000"
     }
   }
 }

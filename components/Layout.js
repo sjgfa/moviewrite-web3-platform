@@ -34,7 +34,9 @@ export default function Layout({ children }) {
 
   const navigation = [
     { name: '首页', href: '/', icon: HomeIcon },
-    { name: '文章', href: '/articles', icon: BookOpenIcon },
+    { name: '发现', href: '/discover', icon: BookOpenIcon },
+    { name: '文章', href: '/articles', icon: FilmIcon },
+    { name: '写作', href: '/write', icon: BookOpenIcon },
     { name: '我的', href: '/profile', icon: UserIcon },
   ];
 

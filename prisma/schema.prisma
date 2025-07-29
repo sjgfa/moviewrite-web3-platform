@@ -1,0 +1,520 @@
+// MovieWrite Prisma Schema for MySQL
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// 用户系统
+// ============================================================================
+
+model User {
+  id             String    @id @default(uuid()) @db.Char(36)
+  walletAddress  String    @unique @map("wallet_address") @db.VarChar(42)
+  email          String?   @unique @db.VarChar(255)
+  username       String?   @unique @db.VarChar(50)
+  status         UserStatus @default(ACTIVE)
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt      DateTime  @updatedAt @map("updated_at") @db.Timestamp(0)
+  lastActiveAt   DateTime  @default(now()) @map("last_active_at") @db.Timestamp(0)
+
+  // Relations
+  profile           UserProfile?
+  articles          Article[]
+  ownedPublications Publication[]
+  publicationMembers PublicationMember[]
+  followers         UserFollow[] @relation("UserFollowing")
+  following         UserFollow[] @relation("UserFollower")
+  likes             ArticleLike[]
+  comments          ArticleComment[]
+  bookmarks         ArticleBookmark[]
+  campaigns         CrowdfundingCampaign[]
+  campaignBacks     CampaignBacker[]
+  tokenRewards      TokenReward[]
+  nftTransactions   NftTransaction[] @relation("NftTransactionFrom")
+  nftTransactionsTo NftTransaction[] @relation("NftTransactionTo")
+  activityLogs      UserActivityLog[]
+  
+  @@index([walletAddress], map: "idx_wallet_address")
+  @@index([username], map: "idx_username")
+  @@index([status, createdAt], map: "idx_status_created")
+  @@map("users")
+}
+
+model UserProfile {
+  id              String   @id @default(uuid()) @db.Char(36)
+  userId          String   @unique @map("user_id") @db.Char(36)
+  displayName     String?  @map("display_name") @db.VarChar(100)
+  bio             String?  @db.Text
+  avatarIpfsHash  String?  @map("avatar_ipfs_hash") @db.VarChar(100)
+  bannerIpfsHash  String?  @map("banner_ipfs_hash") @db.VarChar(100)
+  websiteUrl      String?  @map("website_url") @db.VarChar(500)
+  twitterHandle   String?  @map("twitter_handle") @db.VarChar(50)
+  location        String?  @db.VarChar(100)
+  skills          Json?
+  preferences     Json?
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamp(0)
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
+}
+
+model UserFollow {
+  id          String   @id @default(uuid()) @db.Char(36)
+  followerId  String   @map("follower_id") @db.Char(36)
+  followingId String   @map("following_id") @db.Char(36)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamp(0)
+
+  // Relations
+  follower  User @relation("UserFollower", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("UserFollowing", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId], map: "unique_follow")
+  @@index([followerId], map: "idx_follower")
+  @@index([followingId], map: "idx_following")
+  @@map("user_follows")
+}
+
+// ============================================================================
+// Publication系统
+// ============================================================================
+
+model Publication {
+  id           String            @id @default(uuid()) @db.Char(36)
+  ownerId      String            @map("owner_id") @db.Char(36)
+  name         String            @db.VarChar(100)
+  slug         String            @unique @db.VarChar(100)
+  description  String?           @db.Text
+  logoIpfsHash String?           @map("logo_ipfs_hash") @db.VarChar(100)
+  bannerIpfsHash String?         @map("banner_ipfs_hash") @db.VarChar(100)
+  type         PublicationType   @default(INDIVIDUAL)
+  status       PublicationStatus @default(DRAFT)
+  settings     Json?
+  themeConfig  Json?             @map("theme_config")
+  customDomain String?           @map("custom_domain") @db.VarChar(255)
+  verified     Boolean           @default(false)
+  createdAt    DateTime          @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt    DateTime          @updatedAt @map("updated_at") @db.Timestamp(0)
+
+  // Relations
+  owner     User                 @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  members   PublicationMember[]
+  articles  Article[]
+  campaigns CrowdfundingCampaign[]
+
+  @@index([ownerId, status], map: "idx_owner_status")
+  @@index([slug], map: "idx_slug")
+  @@index([type, status], map: "idx_type_status")
+  @@map("publications")
+}
+
+model PublicationMember {
+  id            String           @id @default(uuid()) @db.Char(36)
+  publicationId String           @map("publication_id") @db.Char(36)
+  userId        String           @map("user_id") @db.Char(36)
+  role          PublicationRole  @default(WRITER)
+  permissions   Json?
+  joinedAt      DateTime         @default(now()) @map("joined_at") @db.Timestamp(0)
+
+  // Relations
+  publication Publication @relation(fields: [publicationId], references: [id], onDelete: Cascade)
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([publicationId, userId], map: "unique_member")
+  @@map("publication_members")
+}
+
+// ============================================================================
+// 文章系统
+// ============================================================================
+
+model Article {
+  id                  String        @id @default(uuid()) @db.Char(36)
+  authorId            String        @map("author_id") @db.Char(36)
+  publicationId       String?       @map("publication_id") @db.Char(36)
+  title               String        @db.VarChar(500)
+  slug                String        @db.VarChar(200)
+  summary             String?       @db.Text
+  contentIpfsHash     String?       @map("content_ipfs_hash") @db.VarChar(100)
+  contentText         String?       @map("content_text") @db.LongText
+  coverImageIpfsHash  String?       @map("cover_image_ipfs_hash") @db.VarChar(100)
+  readingTimeMinutes  Int           @default(0) @map("reading_time_minutes")
+  status              ArticleStatus @default(DRAFT)
+  isFeatured          Boolean       @default(false) @map("is_featured")
+  isPremium           Boolean       @default(false) @map("is_premium")
+  tags                Json?
+  categories          Json?
+  metadata            Json?
+  publishedAt         DateTime?     @map("published_at") @db.Timestamp(0)
+  createdAt           DateTime      @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt           DateTime      @updatedAt @map("updated_at") @db.Timestamp(0)
+
+  // Relations
+  author      User               @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  publication Publication?       @relation(fields: [publicationId], references: [id], onDelete: SetNull)
+  versions    ArticleVersion[]
+  stats       ArticleStats?
+  likes       ArticleLike[]
+  comments    ArticleComment[]
+  bookmarks   ArticleBookmark[]
+  nft         ArticleNft?
+
+  @@unique([publicationId, slug], map: "unique_publication_slug")
+  @@index([authorId, status], map: "idx_author_status")
+  @@index([publicationId, status], map: "idx_publication_status")
+  @@index([publishedAt], map: "idx_published_at")
+  @@index([status, isFeatured], map: "idx_status_featured")
+  @@fulltext([title, contentText], map: "ft_title_content")
+  @@map("articles")
+}
+
+model ArticleVersion {
+  id              String   @id @default(uuid()) @db.Char(36)
+  articleId       String   @map("article_id") @db.Char(36)
+  versionNumber   Int      @map("version_number")
+  title           String   @db.VarChar(500)
+  contentIpfsHash String?  @map("content_ipfs_hash") @db.VarChar(100)
+  changesSummary  String?  @map("changes_summary") @db.Text
+  createdBy       String?  @map("created_by") @db.Char(36)
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamp(0)
+
+  // Relations
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  creator User?   @relation(fields: [createdBy], references: [id], onDelete: SetNull)
+
+  @@unique([articleId, versionNumber], map: "unique_article_version")
+  @@map("article_versions")
+}
+
+model ArticleStats {
+  articleId       String   @id @map("article_id") @db.Char(36)
+  viewCount       BigInt   @default(0) @map("view_count")
+  likeCount       Int      @default(0) @map("like_count")
+  commentCount    Int      @default(0) @map("comment_count")
+  shareCount      Int      @default(0) @map("share_count")
+  bookmarkCount   Int      @default(0) @map("bookmark_count")
+  readTimeTotal   BigInt   @default(0) @map("read_time_total")
+  engagementScore Decimal  @default(0) @map("engagement_score") @db.Decimal(10, 2)
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamp(0)
+
+  // Relations
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@map("article_stats")
+}
+
+// ============================================================================
+// NFT系统
+// ============================================================================
+
+model ArticleNft {
+  id                String         @id @default(uuid()) @db.Char(36)
+  articleId         String         @unique @map("article_id") @db.Char(36)
+  tokenId           BigInt         @unique @map("token_id")
+  contractAddress   String         @map("contract_address") @db.VarChar(42)
+  ownerAddress      String         @map("owner_address") @db.VarChar(42)
+  creatorAddress    String         @map("creator_address") @db.VarChar(42)
+  status            NftStatus      @default(MINTED)
+  mintPrice         Decimal?       @map("mint_price") @db.Decimal(20, 8)
+  currentPrice      Decimal?       @map("current_price") @db.Decimal(20, 8)
+  metadataUri       String?        @map("metadata_uri") @db.Text
+  royaltyPercentage Decimal        @default(7.5) @map("royalty_percentage") @db.Decimal(5, 2)
+  transactionHash   String?        @map("transaction_hash") @db.VarChar(66)
+  blockNumber       BigInt?        @map("block_number")
+  mintedAt          DateTime       @default(now()) @map("minted_at") @db.Timestamp(0)
+  lastSaleAt        DateTime?      @map("last_sale_at") @db.Timestamp(0)
+  createdAt         DateTime       @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt         DateTime       @updatedAt @map("updated_at") @db.Timestamp(0)
+
+  // Relations
+  article      Article          @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  transactions NftTransaction[]
+
+  @@index([contractAddress, tokenId], map: "idx_contract_token")
+  @@index([ownerAddress, status], map: "idx_owner_status")
+  @@index([articleId], map: "idx_article")
+  @@map("article_nfts")
+}
+
+model NftTransaction {
+  id              String              @id @default(uuid()) @db.Char(36)
+  nftId           String              @map("nft_id") @db.Char(36)
+  transactionType NftTransactionType  @map("transaction_type")
+  fromAddress     String?             @map("from_address") @db.VarChar(42)
+  toAddress       String              @map("to_address") @db.VarChar(42)
+  price           Decimal?            @db.Decimal(20, 8)
+  platformFee     Decimal?            @map("platform_fee") @db.Decimal(20, 8)
+  royaltyFee      Decimal?            @map("royalty_fee") @db.Decimal(20, 8)
+  transactionHash String              @map("transaction_hash") @db.VarChar(66)
+  blockNumber     BigInt              @map("block_number")
+  gasUsed         BigInt?             @map("gas_used")
+  gasPrice        Decimal?            @map("gas_price") @db.Decimal(20, 8)
+  createdAt       DateTime            @default(now()) @map("created_at") @db.Timestamp(0)
+
+  // Relations
+  nft         ArticleNft @relation(fields: [nftId], references: [id], onDelete: Cascade)
+  fromUser    User?      @relation("NftTransactionFrom", fields: [fromAddress], references: [walletAddress])
+  toUser      User?      @relation("NftTransactionTo", fields: [toAddress], references: [walletAddress])
+
+  @@index([nftId, transactionType], map: "idx_nft_type")
+  @@index([fromAddress], map: "idx_from_address")
+  @@index([toAddress], map: "idx_to_address")
+  @@index([transactionHash], map: "idx_transaction_hash")
+  @@map("nft_transactions")
+}
+
+// ============================================================================
+// 社交互动系统
+// ============================================================================
+
+model ArticleLike {
+  id        String   @id @default(uuid()) @db.Char(36)
+  articleId String   @map("article_id") @db.Char(36)
+  userId    String   @map("user_id") @db.Char(36)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(0)
+
+  // Relations
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([articleId, userId], map: "unique_like")
+  @@index([articleId], map: "idx_article")
+  @@index([userId], map: "idx_user")
+  @@map("article_likes")
+}
+
+model ArticleComment {
+  id              String        @id @default(uuid()) @db.Char(36)
+  articleId       String        @map("article_id") @db.Char(36)
+  authorId        String        @map("author_id") @db.Char(36)
+  parentId        String?       @map("parent_id") @db.Char(36)
+  content         String        @db.Text
+  contentIpfsHash String?       @map("content_ipfs_hash") @db.VarChar(100)
+  isEdited        Boolean       @default(false) @map("is_edited")
+  likeCount       Int           @default(0) @map("like_count")
+  replyCount      Int           @default(0) @map("reply_count")
+  status          CommentStatus @default(ACTIVE)
+  createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt       DateTime      @updatedAt @map("updated_at") @db.Timestamp(0)
+
+  // Relations
+  article Article          @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  author  User             @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  parent  ArticleComment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies ArticleComment[] @relation("CommentReplies")
+
+  @@index([articleId], map: "idx_article")
+  @@index([authorId], map: "idx_author")
+  @@index([parentId], map: "idx_parent")
+  @@map("article_comments")
+}
+
+model ArticleBookmark {
+  id             String   @id @default(uuid()) @db.Char(36)
+  articleId      String   @map("article_id") @db.Char(36)
+  userId         String   @map("user_id") @db.Char(36)
+  collectionName String   @default("default") @map("collection_name") @db.VarChar(100)
+  notes          String?  @db.Text
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamp(0)
+
+  // Relations
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([articleId, userId], map: "unique_bookmark")
+  @@index([userId, collectionName], map: "idx_user_collection")
+  @@map("article_bookmarks")
+}
+
+// ============================================================================
+// 经济系统
+// ============================================================================
+
+model CrowdfundingCampaign {
+  id            String         @id @default(uuid()) @db.Char(36)
+  creatorId     String         @map("creator_id") @db.Char(36)
+  publicationId String?        @map("publication_id") @db.Char(36)
+  title         String         @db.VarChar(200)
+  description   String         @db.Text
+  goalAmount    Decimal        @map("goal_amount") @db.Decimal(20, 8)
+  raisedAmount  Decimal        @default(0) @map("raised_amount") @db.Decimal(20, 8)
+  currency      String         @default("ETH") @db.VarChar(10)
+  startDate     DateTime       @map("start_date") @db.Timestamp(0)
+  endDate       DateTime       @map("end_date") @db.Timestamp(0)
+  status        CampaignStatus @default(DRAFT)
+  contractAddress String?      @map("contract_address") @db.VarChar(42)
+  milestones    Json?
+  rewards       Json?
+  createdAt     DateTime       @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt     DateTime       @updatedAt @map("updated_at") @db.Timestamp(0)
+
+  // Relations
+  creator     User             @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  publication Publication?     @relation(fields: [publicationId], references: [id], onDelete: SetNull)
+  backers     CampaignBacker[]
+
+  @@index([creatorId, status], map: "idx_creator_status")
+  @@index([status, startDate, endDate], map: "idx_status_dates")
+  @@map("crowdfunding_campaigns")
+}
+
+model CampaignBacker {
+  id              String               @id @default(uuid()) @db.Char(36)
+  campaignId      String               @map("campaign_id") @db.Char(36)
+  backerId        String               @map("backer_id") @db.Char(36)
+  amount          Decimal              @db.Decimal(20, 8)
+  rewardTier      Int?                 @map("reward_tier")
+  transactionHash String?              @map("transaction_hash") @db.VarChar(66)
+  backedAt        DateTime             @default(now()) @map("backed_at") @db.Timestamp(0)
+
+  // Relations
+  campaign CrowdfundingCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  backer   User                 @relation(fields: [backerId], references: [id], onDelete: Cascade)
+
+  @@index([campaignId], map: "idx_campaign")
+  @@index([backerId], map: "idx_backer")
+  @@index([transactionHash], map: "idx_transaction_hash")
+  @@map("campaign_backers")
+}
+
+model TokenReward {
+  id              String           @id @default(uuid()) @db.Char(36)
+  userId          String           @map("user_id") @db.Char(36)
+  actionType      RewardActionType @map("action_type")
+  amount          Decimal          @db.Decimal(20, 8)
+  referenceId     String?          @map("reference_id") @db.Char(36)
+  description     String?          @db.Text
+  transactionHash String?          @map("transaction_hash") @db.VarChar(66)
+  createdAt       DateTime         @default(now()) @map("created_at") @db.Timestamp(0)
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, actionType], map: "idx_user_action")
+  @@index([referenceId], map: "idx_reference")
+  @@index([createdAt], map: "idx_created_at")
+  @@map("token_rewards")
+}
+
+// ============================================================================
+// 系统配置和日志
+// ============================================================================
+
+model SystemConfig {
+  id         String   @id @default(uuid()) @db.Char(36)
+  configKey  String   @unique @map("config_key") @db.VarChar(100)
+  configValue Json?   @map("config_value")
+  description String? @db.Text
+  isPublic   Boolean  @default(false) @map("is_public")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamp(0)
+
+  @@index([configKey], map: "idx_config_key")
+  @@map("system_configs")
+}
+
+model UserActivityLog {
+  id           String   @id @default(uuid()) @db.Char(36)
+  userId       String?  @map("user_id") @db.Char(36)
+  action       String   @db.VarChar(100)
+  resourceType String?  @map("resource_type") @db.VarChar(50)
+  resourceId   String?  @map("resource_id") @db.Char(36)
+  metadata     Json?
+  ipAddress    String?  @map("ip_address") @db.VarChar(45)
+  userAgent    String?  @map("user_agent") @db.Text
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamp(0)
+
+  // Relations
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId, action], map: "idx_user_action")
+  @@index([createdAt], map: "idx_created_at")
+  @@index([resourceType, resourceId], map: "idx_resource")
+  @@map("user_activity_logs")
+}
+
+// ============================================================================
+// 枚举定义
+// ============================================================================
+
+enum UserStatus {
+  ACTIVE    @map("active")
+  SUSPENDED @map("suspended")
+  BANNED    @map("banned")
+  DELETED   @map("deleted")
+}
+
+enum PublicationType {
+  INDIVIDUAL     @map("individual")
+  COLLABORATIVE  @map("collaborative")
+  ORGANIZATION   @map("organization")
+}
+
+enum PublicationStatus {
+  DRAFT     @map("draft")
+  ACTIVE    @map("active")
+  ARCHIVED  @map("archived")
+  SUSPENDED @map("suspended")
+}
+
+enum PublicationRole {
+  OWNER       @map("owner")
+  ADMIN       @map("admin")
+  EDITOR      @map("editor")
+  WRITER      @map("writer")
+  CONTRIBUTOR @map("contributor")
+}
+
+enum ArticleStatus {
+  DRAFT     @map("draft")
+  PUBLISHED @map("published")
+  ARCHIVED  @map("archived")
+  DELETED   @map("deleted")
+}
+
+enum NftStatus {
+  MINTED @map("minted")
+  LISTED @map("listed")
+  SOLD   @map("sold")
+  BURNED @map("burned")
+}
+
+enum NftTransactionType {
+  MINT     @map("mint")
+  TRANSFER @map("transfer")
+  SALE     @map("sale")
+  BURN     @map("burn")
+}
+
+enum CommentStatus {
+  ACTIVE  @map("active")
+  HIDDEN  @map("hidden")
+  DELETED @map("deleted")
+  FLAGGED @map("flagged")
+}
+
+enum CampaignStatus {
+  DRAFT      @map("draft")
+  ACTIVE     @map("active")
+  SUCCESSFUL @map("successful")
+  FAILED     @map("failed")
+  CANCELLED  @map("cancelled")
+}
+
+enum RewardActionType {
+  ARTICLE_PUBLISHED       @map("article_published")
+  ARTICLE_LIKED          @map("article_liked")
+  COMMENT_POSTED         @map("comment_posted")
+  ARTICLE_SHARED         @map("article_shared")
+  REFERRAL_BONUS         @map("referral_bonus")
+  STAKING_REWARD         @map("staking_reward")
+  GOVERNANCE_PARTICIPATION @map("governance_participation")
+  MILESTONE_COMPLETED    @map("milestone_completed")
+}

@@ -107,7 +107,7 @@ export default function Profile() {
         const contributionPromises = contributionIds.map(async (contributionId) => {
           const response = await fetch(`/api/contribution/${contributionId}`);
           const contribution = await response.json();
-          
+          basn
           if (contribution && !contribution.error) {
             // 获取对应的文章信息
             const articleResponse = await fetch(`/api/article/${contribution.articleId}`);

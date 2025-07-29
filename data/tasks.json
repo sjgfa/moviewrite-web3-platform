@@ -1,0 +1,105 @@
+{
+  "project": {
+    "code": "MWT-MIRROR-V2",
+    "name": "MovieWrite Mirror风格转型",
+    "startDate": "2025-07-29T05:46:31.711Z",
+    "phase": "Phase 2A",
+    "status": "active"
+  },
+  "epics": {
+    "MWT-E001": {
+      "id": "MWT-E001",
+      "title": "智能合约升级",
+      "priority": "high",
+      "estimatedWeeks": 4,
+      "status": "pending",
+      "stories": [
+        "MWT-S001"
+      ],
+      "createdAt": "2025-07-29T05:46:35.301Z",
+      "updatedAt": "2025-07-29T05:46:35.301Z"
+    }
+  },
+  "stories": {
+    "MWT-S001": {
+      "id": "MWT-S001",
+      "epicId": "MWT-E001",
+      "title": "个人文章NFT合约",
+      "priority": "high",
+      "status": "pending",
+      "tasks": [
+        "MWT-T001",
+        "MWT-T002"
+      ],
+      "createdAt": "2025-07-29T05:46:35.303Z",
+      "updatedAt": "2025-07-29T05:46:35.303Z"
+    }
+  },
+  "tasks": {
+    "MWT-T001": {
+      "id": "MWT-T001",
+      "storyId": "MWT-S001",
+      "title": "设计ArticleNFT合约架构",
+      "description": "设计支持ERC721标准的文章NFT合约",
+      "priority": "high",
+      "status": "pending",
+      "progress": 0,
+      "estimatedHours": 8,
+      "actualHours": 0,
+      "evidence": [],
+      "dependencies": [],
+      "createdAt": "2025-07-29T05:46:35.304Z",
+      "updatedAt": "2025-07-29T05:46:35.304Z"
+    },
+    "MWT-T002": {
+      "id": "MWT-T002",
+      "storyId": "MWT-S001",
+      "title": "实现ERC721标准功能",
+      "description": "实现mint、transfer等基础NFT功能",
+      "priority": "high",
+      "status": "pending",
+      "progress": 0,
+      "estimatedHours": 16,
+      "actualHours": 0,
+      "evidence": [],
+      "dependencies": [
+        "MWT-T001"
+      ],
+      "createdAt": "2025-07-29T05:46:35.305Z",
+      "updatedAt": "2025-07-29T05:46:35.305Z"
+    }
+  },
+  "history": [
+    {
+      "action": "epic_created",
+      "data": {
+        "epicId": "MWT-E001"
+      },
+      "timestamp": "2025-07-29T05:46:35.301Z"
+    },
+    {
+      "action": "story_created",
+      "data": {
+        "storyId": "MWT-S001",
+        "epicId": "MWT-E001"
+      },
+      "timestamp": "2025-07-29T05:46:35.303Z"
+    },
+    {
+      "action": "task_created",
+      "data": {
+        "taskId": "MWT-T001",
+        "storyId": "MWT-S001"
+      },
+      "timestamp": "2025-07-29T05:46:35.304Z"
+    },
+    {
+      "action": "task_created",
+      "data": {
+        "taskId": "MWT-T002",
+        "storyId": "MWT-S001"
+      },
+      "timestamp": "2025-07-29T05:46:35.305Z"
+    }
+  ]
+}
